@@ -1,0 +1,20 @@
+pacman::p_load(dplyr, ggplot2, data.table, gridExtra)
+
+# empenhos contratos covid19 
+empenhos_covid19 <- fread('https://dados.sc.gov.br/dataset/4b3d481c-0f57-4443-8e95-a13a49746c0d/resource/aa687a73-92fc-4d49-926a-c3f83f3aed85/download/empenhos_contratos.csv')
+
+# agrupar por tipo de contrato
+empenhos_covid19_tipocontrato <- empenhos_covid19 %>% count(DETIPOCONTRATO, sort = T, name = 'casos') %>% mutate(casos2 = sqrt(casos), casosLog = log10(casos))
+
+# nomes para vetor
+nomeVar <- names(empenhos_covid19_tipocontrato)[2:4] 
+listaPlots <- NULL
+
+#lista com plots
+for(i in nomeVar) {
+  plot <- empenhos_covid19_tipocontrato %>% ggplot(aes_string(x = "DETIPOCONTRATO", y=i)) + geom_bar(stat = "identity") + labs(x = "detipocontrato")
+  listaPlots[[length(listaPlots) + 1]] <-plot
+} 
+
+#  todos os plots
+grid.arrange(listaPlots[[1]], listaPlots[[2]], listaPlots[[3]], ncol=3)
